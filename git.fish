@@ -1,11 +1,8 @@
 function gf
   set -l branch (git branch -a | grep $argv[1] | head -1 | sed s/\*// | trim)
-  argparse e/echo t/ticket -- $argv
+  argparse e/echo -- $argv
 
-  if set -q _flag_t
-    set -l ticket (string match -r ".*ch([0-9]*).*" $branch)
-    ch $ticket
-  else if set -q _flag_e
+  if set -q _flag_e
     echo $branch
   else
     gco (echo $branch | sed 's/remotes\/origin\///')
@@ -13,7 +10,7 @@ function gf
 end
 
 function gco
-git checkout $argv
+  git checkout $argv
 end
 
 function gcm
@@ -130,7 +127,7 @@ end
 
 function gpu
   if test (git current) = "master"
-    if prompt "Are you sure you want to push to master (y/n)?"
+    if prompt "Are you sure you want to push to master (y/n)? "
       gpu!
     end
   else

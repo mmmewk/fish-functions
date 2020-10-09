@@ -43,15 +43,17 @@ session = sts.get_federation_token({
 #
 # The sign-in value is the URL of the AWS STS federation endpoint.
 issuer = "aws-login"
-console_url = ARGV[0] ? "https://console.aws.amazon.com/#{ARGV[0]}/home" : "https://console.aws.amazon.com"
+console_url = "https://console.aws.amazon.com/"
+console_url += "#{ARGV[0]}/home" if ARGV.length > 0
+console_url += "?region=#{ARGV[1]}" if ARGV.length > 1
 signin_url = "https://signin.aws.amazon.com/federation"
 
 # Create a block of JSON that contains the temporary credentials
 # (including the access key ID, secret access key, and session token).
 session_json = {
-  :sessionId => session.credentials[:access_key_id],
-  :sessionKey => session.credentials[:secret_access_key],
-  :sessionToken => session.credentials[:session_token]
+  sessionId: session.credentials[:access_key_id],
+  sessionKey: session.credentials[:secret_access_key],
+  sessionToken: session.credentials[:session_token]
 }.to_json
 
 # Call the federation endpoint, passing the parameters
