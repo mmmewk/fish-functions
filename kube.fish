@@ -1,5 +1,5 @@
 function kube-dash
-  echo (aws eks get-token --cluster-name bedrock --profile pineapple --region us-west-2 | jq -r '.status.token') | pbcopy
+  # echo (aws eks get-token --cluster-name my-cluster | jq -r '.status.token') | pbcopy
   open "http://localhost:8080/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/namespace?namespace=default"
   kubectl proxy --port=8080 --address='0.0.0.0' --disable-filter=true
 end
