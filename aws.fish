@@ -15,6 +15,5 @@ function aws-profile
 end
 
 function aws-login
-  argparse r/region -- $argv
-  ruby ~/.config/fish/functions/scripts/ruby/aws-login.rb $argv[1] $_flag_r
+  ruby ~/.config/fish/functions/scripts/ruby/aws-login.rb $argv
 end

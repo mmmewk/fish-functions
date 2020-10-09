@@ -43,9 +43,12 @@ session = sts.get_federation_token({
 #
 # The sign-in value is the URL of the AWS STS federation endpoint.
 issuer = "aws-login"
+service = ARGV.shift
+region_index = ARGV.find_index('-r') || ARGV.find_index('-region')
+region = ARGV[region_index + 1] if region_index
 console_url = "https://console.aws.amazon.com/"
-console_url += "#{ARGV[0]}/home" if ARGV.length > 0
-console_url += "?region=#{ARGV[1]}" if ARGV.length > 1
+console_url += "#{service}/home" if service
+console_url += "?region=#{region}" if region
 signin_url = "https://signin.aws.amazon.com/federation"
 
 # Create a block of JSON that contains the temporary credentials
