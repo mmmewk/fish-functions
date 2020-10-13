@@ -16,7 +16,7 @@ function db-clone
 end
 
 function ticketnum
-    git current | string match -r -a '[\w-]*$'
+    git current | string match -r -a '[\w-]*$' | trim
 end
 
 function ticket
