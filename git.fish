@@ -15,7 +15,8 @@ end
 
 function gcm
   git add .
-  git commit -m $argv
+  set -l ticketnum (ticketnum)
+  git commit -m "[$ticketnum] $argv"
 end
 
 # usage: 
@@ -156,4 +157,8 @@ function grb
     gco -b $argv[1]
     gpu
   end
+end
+
+function gconf
+  nano ~/.gitconfig
 end

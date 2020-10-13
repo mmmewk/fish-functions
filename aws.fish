@@ -1,8 +1,10 @@
 function aws-config
+  touch ~/.aws/config
   nano ~/.aws/config
 end
 
 function aws-creds
+  touch ~/.aws/credentials
   nano ~/.aws/credentials
 end
 

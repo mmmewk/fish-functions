@@ -1,16 +1,13 @@
 function to
   if test (count $argv) -eq 0
-  else if [ $argv[1] = 'functions' ]
+  else if test $argv[1] = 'functions'
     set destination ~/.config/fish/functions
   else
     set destination ~/dev/$argv[1]
   end
 
-  if [ (pwd) = $destination ]
-  else
-    set -g back (pwd)
-    cd $destination
-  end
+  set -g back (pwd)
+  cd $destination
 end
 
 function back
