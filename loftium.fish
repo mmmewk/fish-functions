@@ -16,7 +16,10 @@ function db-clone
 end
 
 function ticketnum
-    git current | string match -r -a '[\w-]*$' | trim
+    set -l num (git current | string match -r -a '[\w-]*$' | trim)
+    if string match -r 'EN-[\w]*' $num
+        set -e num
+    end
 end
 
 function ticket

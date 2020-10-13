@@ -16,7 +16,11 @@ end
 function gcm
   git add .
   set -l ticketnum (ticketnum)
-  git commit -m "[$ticketnum] $argv"
+  if set -q ticketnum[1]
+    git commit -m "[$ticketnum] $argv"
+  else 
+    git commit -m $argv
+  end
 end
 
 # usage: 
