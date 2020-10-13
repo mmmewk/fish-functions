@@ -16,20 +16,18 @@ function db-clone
 end
 
 function ticketnum
-<<<<<<< HEAD
-    git current | string match -r -a '[\w-]*$' | trim
-=======
     set -l num (git current | string match -r -a '[\w-]*$' | trim)
     if string match -r 'EN-[\w]*' $num
         set -e num
     end
->>>>>>> ad128a369e8dc570faa5fcce5e7a76ec4b711f03
 end
 
 function ticket
     set -l ticketnum (ticketnum)
     set -l baseurl "https://loftium.atlassian.net/secure/RapidBoard.jspa?rapidView=2&projectKey=EN&modal=detail&selectedIssue="
-    echo "$baseurl$ticketnum"
+    if set -q ticketnum[1]
+        echo "$baseurl$ticketnum"
+    end
 end
 
 function rs
