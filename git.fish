@@ -10,10 +10,31 @@ function gf
 end
 
 function gco
-  git checkout $argv
+  set -l original_args $argv
+  argparse i/interactive b/branch h/help -- $argv
+  if set -q _flag_i
+    touch ./tmp_branches.txt
+    for branch in (git branch)
+      echo $branch >> ./tmp_branches.txt
+    end
+    vim ./tmp_branches.txt
+    rm ./tmp_branches.txt
+    set -l branch (pbpaste | sed s/^\*// | trim)
+    git checkout $branch
+  else if set -q _flag_h
+    echo "usage: gco [--interactive] [--help]"
+    echo "Alias to git checkout"
+    echo "--interactive open interactive mode, move to branch you want they hit ctl+c enter enter :q enter"
+  else
+    git checkout $original_args
+  end
 end
 
 function gcm
+  argparse f/force -- $argv
+  if not set -q _flag_f && not lease-backend-guards
+    return 1
+  end
   git add .
   set -l ticketnum (ticketnum)
   if set -q ticketnum[1]
@@ -26,16 +47,27 @@ end
 # usage: 
 # gcb test test1 test2 ...
 # will delete all branches except master, your current branch and the listed branches
-
 function gcb
+  argparse i/interactive -- $argv
   set -l safe master staging develop '\*' $argv
   set str (string join '|' $safe)
   set branches (git branch | egrep -v "($str)")
-  for branch in $branches
+  if set -q _flag_i
+    touch ./tmp_branches.txt
+    for branch in $branches
+      echo $branch >> ./tmp_branches.txt
+    end
+    vim ./tmp_branches.txt
+    set branches (cat ./tmp_branches.txt)
+    rm ./tmp_branches.txt
+    echo branches
+  else
+    for branch in $branches
     echo $branch | trim
-  end
-  if prompt "this will delete the listed branches do you want to continue [y/n]: " 
-    git branch | egrep -v "($str)" | xargs git branch -D
+    end
+    if prompt "this will delete the listed branches do you want to continue [y/n]: " 
+      git branch | egrep -v "($str)" | xargs git branch -D
+    end
   end
 end
 
