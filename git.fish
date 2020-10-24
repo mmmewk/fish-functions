@@ -13,18 +13,23 @@ function gco
   set -l original_args $argv
   argparse i/interactive b/branch h/help -- $argv
   if set -q _flag_i
-    touch ./tmp_branches.txt
+    set tmp (mktemp)
+    echo "Welcome to interactive git checkout" >> $tmp
+    echo "Move cursor to the line of the branch you want to checkout" >> $tmp
+    echo "Then hit ctrl+c enter enter to copy to clipboard" >> $tmp
+    echo "Then hit :x to exit" >> $tmp
+    echo "" >> $tmp
     for branch in (git branch)
-      echo $branch >> ./tmp_branches.txt
+      echo $branch >> $tmp
     end
-    vim ./tmp_branches.txt
-    rm ./tmp_branches.txt
+    vim $tmp
+    rm $tmp
     set -l branch (pbpaste | sed s/^\*// | trim)
     git checkout $branch
   else if set -q _flag_h
     echo "usage: gco [--interactive] [--help]"
     echo "Alias to git checkout"
-    echo "--interactive open interactive mode, move to branch you want they hit ctl+c enter enter :q enter"
+    echo "--interactive open interactive mode, move to branch you want they hit ctl+c enter enter :x enter"
   else
     git checkout $original_args
   end
@@ -58,22 +63,24 @@ function gcb
     echo "Press dd to remove a branch from the deletion list." >> $tempfile
     echo "Press :1,\$d enter to remove all branches from the deletion list." >> $tempfile
     echo "Press :x enter finalize the list." >> $tempfile
-    echo "\n" >> tempfile
+    echo "" >> $tempfile
     for branch in $branches
       echo "* $branch" >> $tempfile
     end
     vim $tempfile
-    set branches (cat $tempfile | grep "*" | sed s/\*// | trim)
+    set branches (cat $tempfile | grep "*")
     rm $tempfile
   end
+  set -e cleaned_branches
   for branch in $branches
-    echo $branch | trim
+    set -l clean_branch  (echo $branch | sed s/\*// | trim)
+    set -a cleaned_branches $clean_branch
+    echo $clean_branch
   end
   if prompt "this will delete the listed branches do you want to continue [y/n]: " 
-    for branch in $branches
-      echo "Deleting Branch $branch"
+    for branch in $cleaned_branches
+      git branch -D $branch
     end
-    # git branch | egrep -v "($str)" | xargs git branch -D
   end
 end
 
