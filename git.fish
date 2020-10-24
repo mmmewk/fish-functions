@@ -119,7 +119,12 @@ function pr
   else
     set base master
   end
-  open (repo -e)/compare/$base...(git current)
+  set ticket ticketnum
+  set title $argv[2]
+  if set -q ticket[1]
+    set title "[$ticket] $title"
+  end
+  gh pr create --base $base --title $title --draft
 end
 
 function gpu
