@@ -1,25 +1,18 @@
 
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
-const logSymbols = require('log-symbols');
-const ora = require('ora');
 const prompts = require('prompts');
-const red = `tput setaf 1`;
-const green = `tput setaf 2`;
-const blue = `tput setaf 4`;
-const normal = `tput setaf 7`;
-const spinnerColors = ['yellow', 'blue', 'magenta', 'cyan'];
-const sample = require('lodash/sample');
+const { runInteractive } = require('./interactive-script-exec');
+const colors = require('colors');
 
 async function run () {
   const { stdout: currentBranch } = await exec('git current');
   const { stdout: currentDirectory } = await exec('pwd');
 
   if (currentDirectory.trim() !== '/Users/matthewkoppe/dev/lease-backend') {
-    await execCommand(`echo $(${red}) You must be in "~/dev/lease-backend" to clone the database $(${normal})`);
+    await process.stdout.write(colors.red('You must be in "~/dev/lease-backend" to clone the database'));
     return;
   }
-
 
   const databases = [
     { title: 'Production', value: 'lease-production', hint: 'lease-production' },
@@ -42,7 +35,7 @@ async function run () {
 
   const runInDocker = 'docker-compose run --rm web';
 
-  const choices = [
+  const commands = [
     { title: 'Checkout Master', value: 'git checkout master', disabled: currentBranch.trim() === 'master' },
     { title: 'Take snapshot of database', value: `heroku pg:backups:capture -a ${database}` },
     { title: 'Copy database to local', value: `rm latest.dump;heroku pg:backups:download -a ${database}` },
@@ -53,45 +46,7 @@ async function run () {
     { title: 'Migrate Database', value: `${runInDocker} rails db:migrate` },
   ];
 
-  const { steps } = await prompts({
-    type: 'multiselect',
-    name: 'steps',
-    message: 'Choose Actions you would like to take',
-    choices,
-    warn: "- Already on Master",
-  });
-
-  // exit if prompt exited with ctl+c
-  if (!steps) return;
-  let success = true;
-
-  while (steps.length > 0 && success) {
-    step = steps.shift();
-    success = await (tryStep(step));
-  }
-
-}
-
-async function tryStep(step) {
-  const spinner = ora().start();
-  spinner.color = sample(spinnerColors);
-  spinner.text = step;
-  try {
-    await exec(step);
-    spinner.stopAndPersist({ symbol: logSymbols.success, color: 'green' });
-    return true;
-  } catch(e) {
-    spinner.stopAndPersist({ symbol: logSymbols.error, color: 'red' });
-    return false;
-  }
-
-}
-
-async function execCommand(command) {
-  if (!command) return
-  const { stdout, stderr } = await exec(command)
-  process.stdout.write(stdout)
-  process.stderr.write(stderr)
+  await runInteractive(commands, { warn: "- Already on Master" });
 }
 
 function onError (e) {

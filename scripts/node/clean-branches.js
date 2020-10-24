@@ -7,16 +7,14 @@ const logSymbols = require('log-symbols');
 async function run () {
   const { stdout: branches } = await exec('git branch -v --sort=-committerdate')
 
+  const protectedBranches = ['master'];
+
   const choices = branches
     .split(/\n/)
     .filter(branch => !!branch.trim())
     .map(branch => {
       let [, flag, value, hint] = branch.match(/([* ]) +([^ ]+) +(.+)/)
-      const ticketMatch = value.match(/([EN|en]-[\w]*)/);
-      if (ticketMatch) {
-        hint = `https://loftium.atlassian.net/secure/RapidBoard.jspa?rapidView=2&projectKey=EN&modal=detail&selectedIssue=${ticketMatch[1]}`;
-      }
-      return { value, hint, disabled: flag === '*' || value === 'master' }
+      return { value, hint, disabled: flag === '*' || protectedBranches.includes(value) }
     })
 
   const { toDelete } = await prompts({
@@ -24,6 +22,7 @@ async function run () {
     name: 'toDelete',
     message: 'Delete branches',
     choices,
+    warn: "- Branch is Protected -",
   });
 
   await deleteBranches(toDelete)
