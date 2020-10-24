@@ -125,6 +125,7 @@ function pr
   if set -q ticket[1]
     set title "[$ticket] $title"
   end
+  
   gh pr create --base $base --title $title --draft
 end
 
