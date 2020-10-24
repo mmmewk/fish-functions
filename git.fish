@@ -120,7 +120,7 @@ function pr
   else
     set base master
   end
-  set ticket ticketnum
+  set ticket (ticketnum)
   set title $_flag_t
   if set -q ticket[1]
     set title "[$ticket] $title"
