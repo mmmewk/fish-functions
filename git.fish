@@ -126,7 +126,7 @@ function pr
     set title "[$ticket] $title"
   end
 
-  gh pr create --base $base --title "$title" --draft
+  gh pr create --base $base --draft
 end
 
 function gpu
