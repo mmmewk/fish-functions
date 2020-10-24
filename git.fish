@@ -27,39 +27,8 @@ function gcm
   end
 end
 
-# usage: 
-# gcb test test1 test2 ...
-# will delete all branches except master, your current branch and the listed branches
 function gcb
-  argparse i/interactive -- $argv
-  set -l safe master staging develop '\*' $argv
-  set str (string join '|' $safe)
-  set branches (git branch | egrep -v "($str)")
-  if set -q _flag_i
-    set tempfile (mktemp)
-    echo "Any branch names left in this file when you exit the script will be deleted." >> $tempfile
-    echo "Press dd to remove a branch from the deletion list." >> $tempfile
-    echo "Press :1,\$d enter to remove all branches from the deletion list." >> $tempfile
-    echo "Press :x enter finalize the list." >> $tempfile
-    echo "" >> $tempfile
-    for branch in $branches
-      echo "* $branch" >> $tempfile
-    end
-    vim $tempfile
-    set branches (cat $tempfile | grep "*")
-    rm $tempfile
-  end
-  set -e cleaned_branches
-  for branch in $branches
-    set -l clean_branch  (echo $branch | sed s/\*// | trim)
-    set -a cleaned_branches $clean_branch
-    echo $clean_branch
-  end
-  if prompt "this will delete the listed branches do you want to continue [y/n]: " 
-    for branch in $cleaned_branches
-      git branch -D $branch
-    end
-  end
+  node /Users/matthewkoppe/.config/fish/functions/scripts/node/clean-branches.js
 end
 
 function gbr
