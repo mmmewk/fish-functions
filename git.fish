@@ -10,29 +10,7 @@ function gf
 end
 
 function gco
-  set -l original_args $argv
-  argparse i/interactive b/branch h/help -- $argv
-  if set -q _flag_i
-    set tmp (mktemp)
-    echo "Welcome to interactive git checkout" >> $tmp
-    echo "Move cursor to the line of the branch you want to checkout" >> $tmp
-    echo "Then hit ctrl+c enter enter to copy to clipboard" >> $tmp
-    echo "Then hit :x to exit" >> $tmp
-    echo "" >> $tmp
-    for branch in (git branch)
-      echo $branch >> $tmp
-    end
-    vim $tmp
-    rm $tmp
-    set -l branch (pbpaste | sed s/^\*// | trim)
-    git checkout $branch
-  else if set -q _flag_h
-    echo "usage: gco [--interactive] [--help]"
-    echo "Alias to git checkout"
-    echo "--interactive open interactive mode, move to branch you want they hit ctl+c enter enter :x enter"
-  else
-    git checkout $original_args
-  end
+  git checkout $argv
 end
 
 function gcm
