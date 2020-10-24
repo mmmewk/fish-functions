@@ -34,7 +34,7 @@ async function deleteBranches (branches) {
   await branches.map(async (branch) => {
     const { stdout, stderr } = await exec(`git branch -D ${branch}`)
     process.stdout.write(`${logSymbols.success} ${stdout}`)
-    process.stderr.write(`${logSymbols.error} ${stderr}`)
+    if (stderr) process.stderr.write(`${logSymbols.error} ${stderr}`)
   })
 }
 
