@@ -114,18 +114,8 @@ function repo
 end
 
 function pr
-  argparse b/base= t/title= -- $argv
-  if set -q $_flag_b
-    set base $_flag_b
-  else
-    set base master
-  end
   set ticket (ticketnum)
-  set title $_flag_t
-  if set -q ticket[1]
-    set title "[$ticket] $title"
-  end
-  gh pr create --base $base --title $title --draft
+  gh pr create --base master --title "[$ticket]" --draft --reviewer ColinBohn,jackswiggett,dustinmcbride,bjohnmer
 end
 
 function gpu
