@@ -115,7 +115,7 @@ end
 
 function pr
   set ticket (ticketnum)
-  gh pr create --base master --title "[$ticket]" --draft
+  gh pr create --base master --title "[$ticket]" --draft --reviewer ColinBohn,jackswiggett,dustinmcbride,bjohnmer
 end
 
 function gpu
