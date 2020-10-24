@@ -11,7 +11,7 @@ async function run () {
     .filter(branch => !!branch.trim())
     .map(branch => {
       let [, flag, value, hint] = branch.match(/([* ]) +([^ ]+) +(.+)/)
-      const ticketMatch = value.match(/(EN-[\w]*)/);
+      const ticketMatch = value.match(/([EN|en]-[\w]*)/);
       if (ticketMatch) {
         hint = `https://loftium.atlassian.net/secure/RapidBoard.jspa?rapidView=2&projectKey=EN&modal=detail&selectedIssue=${ticketMatch[1]}`;
       }
@@ -23,13 +23,6 @@ async function run () {
     name: 'toDelete',
     message: 'Delete branches',
     choices,
-    hint: choices[0].hint,
-    onState ({ value }) {
-      const choice = choices.find(c => c.value === value);
-      if (choice) {
-        this.hint = choice.hint;
-      }
-    }
   });
 
   await deleteBranches(toDelete)
