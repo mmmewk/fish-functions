@@ -114,13 +114,14 @@ function repo
 end
 
 function pr
-  if test (count $argv) -eq 1
-    set base $argv[1]
+  argparse b/base= t/title= -- $argv
+  if set -q $_flag_b
+    set base $_flag_b
   else
     set base master
   end
   set ticket ticketnum
-  set title $argv[2]
+  set title $_flag_t
   if set -q ticket[1]
     set title "[$ticket] $title"
   end
