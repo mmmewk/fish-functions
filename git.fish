@@ -53,21 +53,27 @@ function gcb
   set str (string join '|' $safe)
   set branches (git branch | egrep -v "($str)")
   if set -q _flag_i
-    touch ./tmp_branches.txt
+    set tempfile (mktemp)
+    echo "Any branch names left in this file when you exit the script will be deleted." >> $tempfile
+    echo "Press dd to remove a branch from the deletion list." >> $tempfile
+    echo "Press :1,\$d enter to remove all branches from the deletion list." >> $tempfile
+    echo "Press :x enter finalize the list." >> $tempfile
+    echo "\n" >> tempfile
     for branch in $branches
-      echo $branch >> ./tmp_branches.txt
+      echo "* $branch" >> $tempfile
     end
-    vim ./tmp_branches.txt
-    set branches (cat ./tmp_branches.txt)
-    rm ./tmp_branches.txt
-    echo branches
-  else
-    for branch in $branches
+    vim $tempfile
+    set branches (cat $tempfile | grep "*" | sed s/\*// | trim)
+    rm $tempfile
+  end
+  for branch in $branches
     echo $branch | trim
+  end
+  if prompt "this will delete the listed branches do you want to continue [y/n]: " 
+    for branch in $branches
+      echo "Deleting Branch $branch"
     end
-    if prompt "this will delete the listed branches do you want to continue [y/n]: " 
-      git branch | egrep -v "($str)" | xargs git branch -D
-    end
+    # git branch | egrep -v "($str)" | xargs git branch -D
   end
 end
 
