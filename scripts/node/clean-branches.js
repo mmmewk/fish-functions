@@ -2,6 +2,7 @@
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
 const prompts = require('prompts')
+const logSymbols = require('log-symbols');
 
 async function run () {
   const { stdout: branches } = await exec('git branch -v --sort=-committerdate')
@@ -32,8 +33,8 @@ async function deleteBranches (branches) {
   if (!branches) return
   await branches.map(async (branch) => {
     const { stdout, stderr } = await exec(`git branch -D ${branch}`)
-    process.stdout.write(stdout)
-    process.stderr.write(stderr)
+    process.stdout.write(`${logSymbols.success} ${stdout}`)
+    process.stderr.write(`${logSymbols.error} ${stderr}`)
   })
 }
 
