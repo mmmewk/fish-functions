@@ -11,7 +11,8 @@ async function runInteractive(commands, options = {}) {
   const { steps } = await prompts({
     type: 'multiselect',
     name: 'steps',
-    message: 'Choose Actions you would like to take',
+    instructions: false,
+    message: options.prompt || 'Choose Actions you would like to take',
     choices: commands,
     ...options,
   });
@@ -24,6 +25,7 @@ async function runInteractive(commands, options = {}) {
     step = steps.shift();
     success = await (tryCommand(step));
   }
+  return success;
 };
 
 async function tryCommand(step) {
@@ -33,10 +35,8 @@ async function tryCommand(step) {
   try {
     await exec(step);
     spinner.stopAndPersist({ symbol: logSymbols.success, color: 'green' });
-    return true;
   } catch(e) {
     spinner.stopAndPersist({ symbol: logSymbols.error, color: 'red' });
-    return false;
   }
 };
 

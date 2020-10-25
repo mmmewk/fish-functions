@@ -1,18 +1,14 @@
-const { runInteractive, tryCommand } = require('./interactive-script-exec');
+const { runInteractive } = require('./interactive-script-exec');
 
 async function run() {
   commands = [
-    { title: 'Hi', value: 'sleep 1;echo hi' },
-    { title: 'Bye', value: 'sleep 1;echo bye' },
-    { title: 'Why', value: 'sleep 1;echo why' },
-    { title: 'Should Fail', value: 'fail' },
+    { title: 'Hi', value: 'sleep 1' },
+    { title: 'Bye', value: 'sleep 1' },
+    { title: 'Why', value: 'sleep 1' },
+    { title: 'Should Fail', value: 'asdf' },
   ]
 
   await runInteractive(commands)
-  // await tryCommand('sleep 1');
-  // await tryCommand('sleep 1');
-  // await tryCommand('sleep 1');
-  // await tryCommand('sleep 1');
 }
 
 function onError (e) {

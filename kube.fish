@@ -18,7 +18,7 @@ function kube-deploy
   set -l tagversion (math $tagversion + 1)
   set -l tag "$year.$month.$tagversion-$namespace"
   
-  if prompt "this will add the tag '$tag' and deploy the branch '$branch' to the environment '$namespace'. Are you sure (Y/N)? "
+  if prompt "this will add the tag '$tag' and deploy the branch '$branch' to the environment '$namespace'. Are you sure? "
     git tag $tag
     git push origin $tag
   end

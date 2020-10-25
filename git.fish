@@ -14,8 +14,7 @@ function gco
 end
 
 function gcm
-  argparse f/force -- $argv
-  if not set -q _flag_f && not lease-backend-guards
+  if not test-lease-backend
     return 1
   end
   git add .

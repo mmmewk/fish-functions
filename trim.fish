@@ -11,7 +11,3 @@ end
 function trim
   pipe | sed 's/^ *//;s/ *$//'
 end
-
-function copy
-  pipe | pbcopy
-end
