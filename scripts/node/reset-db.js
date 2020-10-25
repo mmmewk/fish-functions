@@ -33,16 +33,17 @@ async function run () {
   // if (!database) return;
 
   const runInDocker = 'docker-compose run --rm web';
+  const isMaster = currentBranch.trim() === 'master';
 
   const commands = [
-    { title: 'Checkout Master', value: 'git checkout master', disabled: currentBranch.trim() === 'master' },
-    { title: 'Take snapshot of database', value: 'heroku pg:backups:capture -a lease-production' },
-    { title: 'Copy database to local', value: 'rm latest.dump;heroku pg:backups:download -a lease-production' },
-    { title: 'Drop database', value: `${runInDocker} bundle exec rake db:drop db:create db:structure:load` },
-    { title: 'Restore database', value: `${runInDocker} pg_restore --verbose --clean --no-acl --no-owner -h db --dbname=postgresql://postgres:@db:5432/lease-backend_development latest.dump; rm -rf storage`},
-    { title: 'Sanitize Database', value: `${runInDocker} bundle exec rake sanitize_db:all` },
-    { title: 'Return to Branch', value: `git checkout ${currentBranch}`, disabled: currentBranch.trim() === 'master' },
-    { title: 'Migrate Database', value: `${runInDocker} rails db:migrate` },
+    { title: 'Checkout Master', value: 'git checkout master', disabled: isMaster, selected: !isMaster },
+    { title: 'Take snapshot of database', value: 'heroku pg:backups:capture -a lease-production', selected: true },
+    { title: 'Download Snapshot', value: 'rm latest.dump;heroku pg:backups:download -a lease-production', selected: true },
+    { title: 'Drop and recreate local database', value: `${runInDocker} bundle exec rake db:drop db:create db:structure:load`, selected: true },
+    { title: 'Restore database from snapshot', value: `${runInDocker} pg_restore --verbose --clean --no-acl --no-owner -h db --dbname=postgresql://postgres:@db:5432/lease-backend_development latest.dump; rm -rf storage`, selected: true},
+    { title: 'Sanitize Data', value: `${runInDocker} bundle exec rake sanitize_db:all`, selected: true },
+    { title: 'Return to Branch', value: `git checkout ${currentBranch}`, disabled: isMaster, selected: !isMaster },
+    { title: 'Migrate Database', value: `${runInDocker} rails db:migrate`, selected: true },
   ];
 
   await runInteractive(commands, { warn: "- Already on Master" });

@@ -14,7 +14,7 @@ function gco
 end
 
 function gcm
-  if not test-lease-backend
+  if not test-lease-backend || not test-listings-frontend
     return 1
   end
   git add .

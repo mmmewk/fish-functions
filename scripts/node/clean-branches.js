@@ -20,8 +20,9 @@ async function run () {
   const { toDelete } = await prompts({
     type: 'multiselect',
     name: 'toDelete',
-    message: 'Delete branches',
+    message: 'Select branches to mark for deletion',
     choices,
+    instructions: false,
     warn: "- Branch is Protected -",
   });
 

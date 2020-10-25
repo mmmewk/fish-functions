@@ -23,11 +23,16 @@ async function run () {
                
   }).filter(fs.existsSync)
   
+  const shouldCheckRuby = rubyFiles.length !== 0;
+  const shouldCheckSpecs = specFiles.length !== 0;
+
   const commands = [
-    { title: 'Rubocop', value: `bundle exec rubocop ${rubyFiles.join(' ')}`, disabled: rubyFiles.length === 0 },
-    { title: 'Sorbet', value: `docker-compose run --rm web srb tc ${rubyFiles.join(' ')}`, disabled: rubyFiles.length === 0 },
-    { title: 'RSpec', value: `docker-compose run --rm web rspec ${specFiles.join(' ')}`, disabled: specFiles.length === 0 },
+    { title: 'Rubocop', value: `bundle exec rubocop ${rubyFiles.join(' ')}`, disabled: !shouldCheckRuby, selected: shouldCheckRuby },
+    { title: 'Sorbet', value: `docker-compose run --rm web srb tc ${rubyFiles.join(' ')}`, disabled: !shouldCheckRuby, selected: shouldCheckRuby },
+    { title: 'RSpec', value: `docker-compose run --rm web rspec ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs },
   ]
+
+  if (!shouldCheckRuby && !shouldCheckSpecs) process.exit(0);
 
   const success = await runInteractive(commands, { prompt: 'Which features would you like to test?', warn: '- No Files to test.' });
 
