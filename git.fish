@@ -37,12 +37,6 @@ function gbr
   git stash apply
 end
 
-function gnb
-  gf release/sp
-  git pull
-  git checkout -b mekoppe/ch$argv[1]/$argv[2]
-end
-
 function gs
   git status
 end
@@ -59,40 +53,11 @@ function gsync
   git pull origin $branch --squash
   gcm "pull: $branch"
   gs
-  if prompt 'are you sure you want to merge' $branch ' into ' $argv[1] ' (y/n): '
+  set -l dest $argv[1]
+  if prompt "are you sure you want to merge $branch into $dest"
     git push
   end
   gco $branch
-end
-
-function git-stage
-  if test (count $argv) -eq 1
-    gf $argv[1]
-  end
-  set -l branch (git current)
-  git save
-  git push -u origin $branch
-  gco staging
-  git pull
-  git pull origin $branch --squash
-  git commit -m "pull: $branch"
-  git status
-  if prompt 'are you sure you want to stage' $branch '(y/n): '
-    git push
-  end
-end
-
-function git-deploy
-  git save
-  gco master
-  git pull
-  git pull origin develop --squash
-  set -l message deployment: (date '+%m/%d/%y')
-  git commit -m $message
-  git status
-  if prompt 'are you sure you want to deploy (y/n): '
-    git push
-  end
 end
 
 function repo
@@ -115,12 +80,12 @@ end
 
 function pr
   set ticket (ticketnum)
-  gh pr create --base master --title "[$ticket]" --draft --reviewer ColinBohn,jackswiggett,dustinmcbride,bjohnmer
+  gh pr create --base master --title "[$ticket]" --draft --reviewer ColinBohn,jackswiggett,dustinmcbride,bjohnmer $argv
 end
 
 function gpu
   if test (git current) = "master"
-    if prompt "Are you sure you want to push to master (y/n)? "
+    if prompt "Are you sure you want to push to master?"
       gpu!
     end
   else
@@ -141,8 +106,7 @@ function gdel
 end
 
 function grb
-  echo "This will delete and recreate the branch $argv[1]."
-  if prompt "Are you sure (y/n)? "
+  if prompt "This will delete and recreate the branch $argv[1]. Are you sure?"
     gco master
     gdel $argv[1]
     gdelr $argv[1]
