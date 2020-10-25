@@ -106,11 +106,12 @@ function gdel
 end
 
 function grb
-  if prompt "This will delete and recreate the branch $argv[1]. Are you sure?"
+  set -l target $argv[1]
+  if prompt "This will delete and recreate the branch $target. Are you sure?"
     gco master
-    gdel $argv[1]
-    gdelr $argv[1]
-    gco -b $argv[1]
+    gdel $target
+    gdelr $target
+    gco -b $target
     gpu
   end
 end
