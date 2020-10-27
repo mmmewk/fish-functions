@@ -9,5 +9,5 @@ function pipe
 end
 
 function trim
-  pipe | sed 's/^ *//;s/ *$//'
+  pipe | sed 's/^( |\t)*//;s/( |\t)*$//'
 end

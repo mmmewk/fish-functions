@@ -77,7 +77,11 @@ function repo
   end
 end
 
-function pr
+function opr
+  set -l open_pr (gh pr view | grep "url\:\s" | sed s/url\\:// | trim)
+end
+
+function prc
   set ticket (ticketnum)
   gh pr create --base master --title "[$ticket]" --draft --reviewer ColinBohn,jackswiggett,dustinmcbride,bjohnmer $argv
 end

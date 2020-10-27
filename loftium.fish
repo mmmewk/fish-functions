@@ -18,5 +18,5 @@ function ticket
 end
 
 function rs
-    dr bundle exec rspec $argv
+    dr bundle exec rspec $argv # | grep "rspec" | sed s/^rspec\ // | sed s/\#.\*//)
 end
