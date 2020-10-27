@@ -26,6 +26,14 @@ async function run () {
     warn: "- Branch is Protected -",
   });
 
+  const { confirmed } = await prompts({
+    type: 'confirm',
+    name: 'confirmed',
+    message: `Warning this will delete the following branches do you want to continue: \n${toDelete.join('\n')}`,
+  });
+
+  if (!confirmed) return 1;
+
   await deleteBranches(toDelete)
 }
 
@@ -33,8 +41,8 @@ async function deleteBranches (branches) {
   if (!branches) return
   await branches.map(async (branch) => {
     const { stdout, stderr } = await exec(`git branch -D ${branch}`)
-    process.stdout.write(`${logSymbols.success} ${stdout}`)
-    if (stderr) process.stderr.write(`${logSymbols.error} ${stderr}`)
+    console.info(`${logSymbols.success} ${stdout}`)
+    if (stderr) console.error(`${logSymbols.error} ${stderr}`)
   })
 }
 

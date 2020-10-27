@@ -11,8 +11,9 @@ async function run () {
     process.exit(0);
   }
 
-  const { stdout: fileString } = await exec('git ls-files -m');
+  const { stdout: fileString } = await exec('git diff --name-status master');
   const typescriptFiles = fileString.split(/\n/)
+                          .map(file => file.replace(/^[AM]\s*/, ''))
                           .filter(file => !!file.trim())
                           .filter(file => file.match(/\.(ts|tsx)$/));
 
@@ -25,9 +26,9 @@ async function run () {
 
   if (!shouldRunTests) process.exit(0);
 
-  const success = await runInteractive(commands, { prompt: 'Which features would you like to test?', warn: '- No Files to test.' });
+  const exitCode = await runInteractive(commands, { prompt: 'Which features would you like to test?', warn: '- No Files to test.' });
 
-  process.exit(success ? 0 : 1)
+  process.exit(exitCode)
 }
 
 function onError (e) {

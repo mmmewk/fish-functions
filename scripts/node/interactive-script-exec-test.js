@@ -2,13 +2,17 @@ const { runInteractive } = require('./interactive-script-exec');
 
 async function run() {
   commands = [
-    { title: 'Hi', value: 'sleep 1' },
-    { title: 'Bye', value: 'sleep 1' },
-    { title: 'Why', value: 'sleep 1' },
-    { title: 'Should Fail', value: 'asdf' },
+    { title: 'Sleep for one second', value: 'sleep 1' },
+    { title: 'ls in other cwd', value: 'ls', cwd: '/Users/matthewkoppe/dev/lease-backend' },
+    { title: 'Sleep for another second', value: 'sleep 1' },
+    { title: 'Echo into the void', value: 'echo into the void' },
+    { title: 'Command that should fail', value: 'echo foo;exit 1' },
+    { title: 'Command should never be reached', value: 'echo ahh im naked' },
   ]
 
-  await runInteractive(commands)
+  const exitCode = await runInteractive(commands);
+
+  process.exit(exitCode);
 }
 
 function onError (e) {
