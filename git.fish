@@ -9,6 +9,10 @@ function gf
   end
 end
 
+function gci
+  node /Users/matthewkoppe/.config/fish/functions/scripts/node/git-checkout-interactive.js
+end
+
 function gco
   git checkout $argv
 end
@@ -121,4 +125,13 @@ end
 
 function gconf
   nano ~/.gitconfig
+end
+
+function gdif
+  argparse r/remote m/master -- $argv
+  if set -q _flag_m
+    git diff --stat -color (git current) origin/master
+  else
+    git diff --stat --color (git current) origin/(git current)
+  end
 end
