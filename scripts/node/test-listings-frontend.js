@@ -1,22 +1,9 @@
-
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
-const { runInteractive } = require('./interactive-script-exec');
-const fs = require('fs')
+const { runInteractive, getChangedFiles, verifyDirectory, onError } = require('./utils');
 
 async function run () {
-  const { stdout: currentDirectory } = await exec('pwd');
+  if (!verifyDirectory('/Users/matthewkoppe/dev/listings-frontend', { silent: true })) process.exit(0);
 
-  if (currentDirectory.trim() !== '/Users/matthewkoppe/dev/listings-frontend') {
-    process.exit(0);
-  }
-
-  const { stdout: fileString } = await exec('git diff --name-status master');
-  const typescriptFiles = fileString.split(/\n/)
-                          .map(file => file.replace(/^[AM]\s*/, ''))
-                          .filter(file => !!file.trim())
-                          .filter(file => file.match(/\.(ts|tsx)$/));
-
+  const typescriptFiles = await getChangedFiles({ extensions: ['ts','tsx'] });
   const shouldRunTests = typescriptFiles.length !== 0;
 
   const commands = [
@@ -29,14 +16,6 @@ async function run () {
   const exitCode = await runInteractive(commands, { prompt: 'Which features would you like to test?', warn: '- No Files to test.' });
 
   process.exit(exitCode)
-}
-
-function onError (e) {
-  if (e.stderr) {
-    process.stderr.write(e.stderr)
-  } else {
-    console.error(e)
-  }
 }
 
 run().catch(onError)

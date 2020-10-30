@@ -1,21 +1,14 @@
-
-const { promisify } = require('util')
-const exec = promisify(require('child_process').exec)
-const prompts = require('prompts')
-const logSymbols = require('log-symbols');
+const prompts = require('prompts');
+const { getBranches, execCommand, prompt } = require ('./utils');
 
 async function run () {
-  const { stdout: branches } = await exec('git branch -v --sort=-committerdate')
-
   const protectedBranches = ['master'];
 
-  const choices = branches
-    .split(/\n/)
-    .filter(branch => !!branch.trim())
-    .map(branch => {
-      let [, flag, value, hint] = branch.match(/([* ]) +([^ ]+) +(.+)/)
-      return { value, hint, disabled: flag === '*' || protectedBranches.includes(value) }
-    })
+  const branches = await getBranches();
+  const choices = branches.map(branch => {
+    let [, flag, value, hint] = branch.match(/([* ])?\s*([\w-_/\\]+) +(.+)/)
+    return { value, hint, disabled: flag === '*' || protectedBranches.includes(value) }
+  });
 
   const { toDelete } = await prompts({
     type: 'multiselect',
@@ -26,24 +19,20 @@ async function run () {
     warn: "- Branch is Protected -",
   });
 
-  const { confirmed } = await prompts({
-    type: 'confirm',
-    name: 'confirmed',
-    message: `Warning this will delete the following branches do you want to continue: \n${toDelete.join('\n')}`,
-  });
+  if (!toDelete) process.exit(1);
 
-  if (!confirmed) return 1;
+  const confirmed = await prompt(`Warning this will delete the following branches do you want to continue: \n${toDelete.join('\n')}\n`);
+
+  if (!confirmed) process.exit(1);
 
   await deleteBranches(toDelete)
+
+  process.exit(0);
 }
 
 async function deleteBranches (branches) {
   if (!branches) return
-  await branches.map(async (branch) => {
-    const { stdout, stderr } = await exec(`git branch -D ${branch}`)
-    console.info(`${logSymbols.success} ${stdout}`)
-    if (stderr) console.error(`${logSymbols.error} ${stderr}`)
-  })
+  while (branches.length > 0) await execCommand(`git branch -D ${branches.pop()}`);
 }
 
 function onError (e) {

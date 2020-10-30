@@ -1,52 +1,34 @@
 
-const { promisify } = require('util');
-const exec = promisify(require('child_process').exec);
-const { runInteractive } = require('./interactive-script-exec');
+const { runInteractive, getChangedFiles, getCurrentBranch, verifyDirectory, onError } = require('./utils');
 const fs = require('fs');
 
 async function run () {
-  const { stdout: currentDirectory } = await exec('pwd');
+  if (!verifyDirectory('/Users/matthewkoppe/dev/lease-backend', { silent: true })) process.exit(0);
+  const currentBranch = await getCurrentBranch();
 
-  if (currentDirectory.trim() !== '/Users/matthewkoppe/dev/lease-backend') {
-    process.exit(0);
-  }
+  const rubyFiles = await getChangedFiles({ extensions: ['.rb', '.rake'], branch: currentBranch });
+  const lintableFiles = rubyFiles.filter(file => file.match(/^(app|lib|spec|config)\//))
 
-  const { stdout: fileString } = await exec('git diff --name-status master');
-  const rubyFiles = fileString.split(/\n/)
-                          .map(file => file.replace(/^[AM]\s*/, ''))
-                          .filter(file => !!file.trim())
-                          .filter(file => file.match(/^(app|lib|spec|config)\//))
-                          .filter(file => file.match(/\.(rb|rake)$/));
-
-  const specFiles = rubyFiles.map((file) => {
+  const specFiles = lintableFiles.map((file) => {
     return file.replace(/^(app|lib|spec|config)\//, 'spec/')
                .replace(/controllers\/api\//, 'requests/')
                .replace(/(_spec|_controller)?\.(rb|rake)$/, '_spec.rb')
-               
   }).filter(fs.existsSync)
   
-  const shouldCheckRuby = rubyFiles.length !== 0;
+  const shouldLint = lintableFiles.length !== 0;
   const shouldCheckSpecs = specFiles.length !== 0;
 
   const commands = [
-    { title: 'Rubocop', value: `bundle exec rubocop ${rubyFiles.join(' ')}`, disabled: !shouldCheckRuby, selected: shouldCheckRuby },
-    { title: 'Sorbet', value: `docker-compose run --rm web srb tc ${rubyFiles.join(' ')}`, disabled: !shouldCheckRuby, selected: shouldCheckRuby },
-    { title: 'RSpec', value: `docker-compose run --rm web rspec ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs },
+    { title: 'Rubocop', value: `rubocop ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Sorbet', value: `srb tc ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: shouldLint },
+    { title: 'RSpec', value: `rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
   ]
 
-  if (!shouldCheckRuby && !shouldCheckSpecs) process.exit(0);
+  if (!shouldLint && !shouldCheckSpecs) process.exit(0);
 
   const exitCode = await runInteractive(commands, { prompt: 'Which features would you like to test?', warn: '- No Files to test.' });
 
   process.exit(exitCode)
-}
-
-function onError (e) {
-  if (e.stderr) {
-    process.stderr.write(e.stderr)
-  } else {
-    console.error(e)
-  }
 }
 
 run().catch(onError)
