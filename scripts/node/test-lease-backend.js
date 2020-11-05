@@ -1,14 +1,22 @@
 
-const { runInteractive, getChangedFiles, getCurrentBranch, verifyDirectory, onError } = require('./utils');
+const { runInteractive, getChangedFiles, promptSelect, scriptError } = require('matts-dev-tools/utils');
+const { getCurrentBranch } = require('matts-dev-tools/git');
 const fs = require('fs');
 
 async function run () {
-  if (!verifyDirectory('/Users/matthewkoppe/dev/lease-backend', { silent: true })) process.exit(0);
+  if (process.cwd() !== '/Users/matthewkoppe/dev/lease-backend') process.exit(0);
   const currentBranch = await getCurrentBranch();
 
-  const rubyFiles = await getChangedFiles({ extensions: ['.rb', '.rake'], branch: currentBranch });
+  const testAgainst = await promptSelect('Test changes against which base?', [{ title: 'Last Commit', value: currentBranch }, { title: 'Master', value: 'origin/master' }, 'none']);
+
+  if (testAgainst === 'none') process.exit(0);
+
+
+  const rubyFiles = await getChangedFiles({ extensions: ['.rb', '.rake'], branch: testAgainst });
+    // TODO: some files aren't lintable check again
   const lintableFiles = rubyFiles.filter(file => file.match(/^(app|lib|spec|config)\//))
 
+  // look for spec files by assuming the filenames match up
   const specFiles = lintableFiles.map((file) => {
     return file.replace(/^(app|lib|spec|config)\//, 'spec/')
                .replace(/controllers\/api\//, 'requests/')
@@ -19,8 +27,8 @@ async function run () {
   const shouldCheckSpecs = specFiles.length !== 0;
 
   const commands = [
-    { title: 'Rubocop', value: `rubocop ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
-    { title: 'Sorbet', value: `srb tc ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: shouldLint },
+    { title: 'Rubocop', value: 'rubocop', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Sorbet', value: 'srb tc', disabled: !shouldLint, selected: shouldLint },
     { title: 'RSpec', value: `rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
   ]
 
@@ -31,4 +39,4 @@ async function run () {
   process.exit(exitCode)
 }
 
-run().catch(onError)
+run().catch(scriptError)

@@ -9,10 +9,6 @@ function gf
   end
 end
 
-function gci
-  node /Users/matthewkoppe/.config/fish/functions/scripts/node/git-checkout-interactive.js
-end
-
 function gco
   git checkout $argv
 end
@@ -28,10 +24,6 @@ function gcm
   else 
     git commit -m $argv
   end
-end
-
-function gcb
-  node /Users/matthewkoppe/.config/fish/functions/scripts/node/clean-branches.js
 end
 
 function gbr

@@ -11,10 +11,7 @@ end
 
 function ticket
     set -l ticketnum (ticketnum)
-    set -l baseurl "https://loftium.atlassian.net/secure/RapidBoard.jspa?rapidView=2&projectKey=EN&modal=detail&selectedIssue="
-    if set -q ticketnum[1]
-        echo "$baseurl$ticketnum"
-    end
+    echo "https://loftium.atlassian.net/browse/$ticketnum"
 end
 
 function rs

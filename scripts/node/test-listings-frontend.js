@@ -1,7 +1,7 @@
-const { runInteractive, getChangedFiles, verifyDirectory, onError } = require('./utils');
+const { runInteractive, getChangedFiles, scriptError } = require('matts-dev-tools/utils');
 
 async function run () {
-  if (!verifyDirectory('/Users/matthewkoppe/dev/listings-frontend', { silent: true })) process.exit(0);
+  if (process.cwd() !== '/Users/matthewkoppe/dev/listings-frontend') process.exit(0);
 
   const typescriptFiles = await getChangedFiles({ extensions: ['ts','tsx'] });
   const shouldRunTests = typescriptFiles.length !== 0;
@@ -18,4 +18,4 @@ async function run () {
   process.exit(exitCode)
 }
 
-run().catch(onError)
+run().catch(scriptError)
