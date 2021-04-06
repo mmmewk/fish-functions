@@ -17,8 +17,12 @@ function gcm
   if not test-lease-backend || not test-listings-frontend
     return 1
   end
-  set -l last_commit_message (git last)
-  if [ (git last) = 'progress save' ]
+
+  gcm! $argv
+end
+
+function gcm!
+  while [ (git last) = 'progress save' ]
     git uncommit
   end
   git add .
