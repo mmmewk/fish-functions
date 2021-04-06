@@ -8,7 +8,8 @@ async function run () {
 
   const commands = [
     { title: 'Jest', value: `yarn test`, disabled: !shouldRunTests, selected: shouldRunTests },
-    { title: 'Eslint', value: `eslint ${typescriptFiles.join(' ')}`, disabled: !shouldRunTests, selected: shouldRunTests },
+    { title: 'Eslint', value: `eslint src`, disabled: !shouldRunTests, selected: shouldRunTests },
+    { title: 'Typecheck', value: `yarn typecheck`, disabled: !shouldRunTests, selected: shouldRunTests },
   ]
 
   if (!shouldRunTests) process.exit(0);

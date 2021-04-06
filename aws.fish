@@ -15,7 +15,3 @@ end
 function aws-profile
   export AWS_PROFILE="$argv[1]"
 end
-
-function aws-login
-  ruby ~/.config/fish/functions/scripts/ruby/aws-login.rb $argv
-end

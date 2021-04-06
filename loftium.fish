@@ -1,5 +1,5 @@
 function db-reset
-    node /Users/matthewkoppe/.config/fish/functions/scripts/node/reset-db.js
+    yarn db-clone-production
 end
 
 function ticketnum
@@ -15,5 +15,13 @@ function ticket
 end
 
 function rs
-    dr bundle exec rspec $argv # | grep "rspec" | sed s/^rspec\ // | sed s/\#.\*//)
+    de bundle exec rspec $argv
+end
+
+function srb-update
+    de ./sorbet/rbi-update.sh
+end
+
+function rails-reset
+    de touch tmp/restart.txt
 end

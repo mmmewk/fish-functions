@@ -10,6 +10,7 @@ async function run () {
   const testAgainst = await promptSelect('Test changes against which base?', [{ title: 'Last Commit', value: currentBranch }, { title: 'Master', value: 'origin/master' }, 'none']);
 
   if (testAgainst === 'none') process.exit(0);
+  if (testAgainst === null) process.exit(1);
 
 
   const rubyFiles = await getChangedFiles({ extensions: ['.rb', '.rake'], branch: testAgainst });
@@ -17,17 +18,21 @@ async function run () {
   const lintableFiles = rubyFiles.filter(file => file.match(/^(app|lib|spec|config)\//))
 
   // look for spec files by assuming the filenames match up
-  const specFiles = lintableFiles.map((file) => {
+  let specFiles = lintableFiles.map((file) => {
     return file.replace(/^(app|lib|spec|config)\//, 'spec/')
                .replace(/controllers\/api\//, 'requests/')
                .replace(/(_spec|_controller)?\.(rb|rake)$/, '_spec.rb')
   }).filter(fs.existsSync)
+
+  // Unique
+  specFiles = specFiles.filter((file, index) => specFiles.indexOf(file) === index);
   
   const shouldLint = lintableFiles.length !== 0;
   const shouldCheckSpecs = specFiles.length !== 0;
 
   const commands = [
-    { title: 'Rubocop', value: 'rubocop', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Rubocop', value: 'rubocop --fail-level=convention --display-only-fail-level-offenses', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Update Sorbet Generated Files', value: './sorbet/rbi-update.sh', docker: true, selected: false },
     { title: 'Sorbet', value: 'srb tc', disabled: !shouldLint, selected: shouldLint },
     { title: 'RSpec', value: `rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
   ]

@@ -17,6 +17,10 @@ function gcm
   if not test-lease-backend || not test-listings-frontend
     return 1
   end
+  set -l last_commit_message (git last)
+  if [ (git last) = 'progress save' ]
+    git uncommit
+  end
   git add .
   set -l ticketnum (ticketnum)
   if set -q ticketnum[1]

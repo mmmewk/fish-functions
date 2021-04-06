@@ -1,4 +1,4 @@
-const { promptSelect } = require('matts-dev-tools/utils'); 
+const { scriptError, promptSelect } = require('matts-dev-tools/utils'); 
 
 async function run() {
   const option = await promptSelect(process.argv[2], process.argv.slice(3));
@@ -6,4 +6,4 @@ async function run() {
   process.exit(0);
 }
 
-run().catch(onError);
+run().catch(scriptError);
