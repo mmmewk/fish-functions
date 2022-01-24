@@ -1,0 +1,20 @@
+
+[alias]
+    current = rev-parse --abbrev-ref HEAD
+    rename = branch -m
+    conf = ! nano ~/.gitconfig
+    save = ! git add . && git commit -m 'progress save'
+    last = show -s --format='%s'
+    uncommit = reset head^
+    recommit = ! git uncommit && git add . && git commit -m
+    reset-to-remote = ! git fetch origin && git reset --hard origin/$(git current)
+    changes = diff --name-status origin/master
+
+    # Fun commands
+    whats-up = status
+
+[user]
+    email = mmmewk@gmail.com
+    name = Matthew Koppe
+[pull]
+    rebase = false

@@ -31,7 +31,8 @@ async function run () {
   const shouldCheckSpecs = specFiles.length !== 0;
 
   const commands = [
-    { title: 'Rubocop', value: 'rubocop --fail-level=convention --display-only-fail-level-offenses', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Rubocop Convention Level on Project', value: 'rubocop --fail-level=convention --display-only-fail-level-offenses -a', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
+    { title: 'Rubocop Refactor Level on changed files', value: `rubocop ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: false, bundler: true, docker: false },
     { title: 'Update Sorbet Generated Files', value: './sorbet/rbi-update.sh', docker: true, selected: false },
     { title: 'Sorbet', value: 'srb tc', disabled: !shouldLint, selected: shouldLint },
     { title: 'RSpec', value: `rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
