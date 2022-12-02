@@ -3,10 +3,7 @@ function db-reset
 end
 
 function ticketnum
-    set -l num (git current | string match -r -a '[\w-]*$' | trim)
-    if string match -r 'EN-[\w]*' $num
-        set -e num
-    end
+    git current | string match -r 'EN-\d*'
 end
 
 function ticket
@@ -36,4 +33,8 @@ end
 
 function rails-reset
     de touch tmp/restart.txt
+end
+
+function copy-env
+    pbcopy < ~/dev/lease-backend/.env
 end

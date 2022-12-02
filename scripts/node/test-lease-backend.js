@@ -34,8 +34,8 @@ async function run () {
     { title: 'Rubocop Convention Level on Project', value: 'rubocop --fail-level=convention --display-only-fail-level-offenses -a', disabled: !shouldLint, selected: shouldLint, bundler: true, docker: false },
     { title: 'Rubocop Refactor Level on changed files', value: `rubocop ${lintableFiles.join(' ')}`, disabled: !shouldLint, selected: false, bundler: true, docker: false },
     { title: 'Update Sorbet Generated Files', value: './sorbet/rbi-update.sh', docker: true, selected: false },
-    { title: 'Sorbet', value: 'srb tc', disabled: !shouldLint, selected: shouldLint },
-    { title: 'RSpec', value: `rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
+    { title: 'Sorbet', value: 'srb tc', disabled: !shouldLint, selected: shouldLint, bundler: true },
+    { title: 'RSpec', value: `bin/rspec --fail-fast ${specFiles.join(' ')}`, disabled: !shouldCheckSpecs, selected: shouldCheckSpecs, docker: true, bundler: true },
   ]
 
   if (!shouldLint && !shouldCheckSpecs) process.exit(0);
